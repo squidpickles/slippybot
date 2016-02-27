@@ -1,0 +1,10 @@
+[package]
+name = "slippy-rs"
+version = "0.1.0"
+authors = ["Kevin Rauwolf <kevin@fgsake.org>"]
+
+[dependencies]
+slack = "*"
+regex = "*"
+log = "*"
+env_logger = "*"
