@@ -12,6 +12,7 @@ pub enum Disposition {
 
 pub trait Command {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, user_id: &str, channel: &str) -> Result<Disposition, error::Error>;
+    fn periodic(&mut self, cli: &mut slack::RtmClient);
 }
 
 pub struct SlippyBrain {
@@ -26,6 +27,12 @@ impl SlippyBrain {
                 Box::new(HowAreYou::new()),
                 Box::new(Joy::new()),
             ],
+        }
+    }
+
+    pub fn periodic(&mut self, cli: &mut slack::RtmClient) {
+        for task in self.commands.iter_mut() {
+            task.periodic(cli);
         }
     }
 

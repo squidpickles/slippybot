@@ -3,79 +3,88 @@ use error;
 use brain::{Command, Disposition};
 use cron::CronSchedule;
 use chrono::UTC;
+use chrono::datetime::DateTime;
 use regex::Regex;
-use std::sync::{Arc, Mutex};
-use std::thread;
-use std::time::Duration;
 
-static WAIT_TIME: u64 = 1;
+const NOTIFY_SCHEDULE: &'static str = "0-59 0-23 1-31 1-12 0-7 2000-3000";
 
 pub struct Joy {
     start_pattern: Regex,
     stop_pattern: Regex,
-    running: Arc<Mutex<bool>>,
+    schedule: CronSchedule,
+    last: Option<DateTime<UTC>>,
 }
 
 impl Joy {
     pub fn new() -> Joy {
         Joy {
-            start_pattern: Regex::new(r"(?i)joy start (?P<schedule>\S+ \S+ \S+ \S+ \S+)").unwrap(),
+            start_pattern: Regex::new(r"(?i)joy start").unwrap(),
             stop_pattern: Regex::new(r"(?i)joy stop").unwrap(),
-            running: Arc::new(Mutex::new(false)),
+            schedule: CronSchedule::parse(NOTIFY_SCHEDULE).unwrap(),
+            last: None,
         }
     }
 
-    fn start(&mut self, schedule: CronSchedule) -> Result<(), error::Error> {
-        let running = self.running.clone();
-        thread::spawn(move || {
-            let wait_time = Duration::new(WAIT_TIME, 0);
-            for next in schedule.upcoming().into_iter() {
-                loop {
-                    let now = UTC::now();
-                    if now < next {
-                        thread::sleep(wait_time);
-                    } else {
-                        // TODO: do something
-                        break;
-                    }
-                    if !*running.lock().unwrap() {
-                        return
-                    }
-                }
-            }
-        });
-        Ok(())
-    }
-
-    fn stop(&mut self) {
-        let running = self.running.clone();
-        *running.lock().unwrap() = false;
-    }
-
-    fn running(&self) -> bool {
-        let running = self.running.clone();
-        return *running.lock().unwrap();
-    }
 }
 
 impl Command for Joy {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, _: &str, channel: &str) -> Result<Disposition, error::Error> {
         if self.start_pattern.is_match(text) {
-            if self.running() {
-                try!(cli.send_message(channel, "The Preservation of Joy reminder is already running. Try running 'stop' first."));
-                return Ok(Disposition::Handled)
+            match self.last {
+                Some(_) => {
+                    try!(cli.send_message(channel, "I'm already full of joy!"));
+                    Ok(Disposition::Handled)
+                },
+                None => {
+                    self.last = Some(UTC::now());
+                    try!(cli.send_message(channel, "I won't let you down."));
+                    Ok(Disposition::Handled)
+                }
             }
-            let captures = self.start_pattern.captures(text).unwrap();
-            let schedule_text = captures.name("schedule").unwrap();
-            let schedule = try!(CronSchedule::parse(schedule_text));
-            try!(self.start(schedule));
-            try!(cli.send_message(channel, "Great!"));
-            Ok(Disposition::Handled)
         } else if self.stop_pattern.is_match(text) {
-            self.stop();
-            Ok(Disposition::Handled)
+            match self.last {
+                Some(_) => {
+                    self.last = None;
+                    try!(cli.send_message(channel, "I'll stop saying stuff."));
+                    Ok(Disposition::Handled)
+                },
+                None => {
+                    try!(cli.send_message(channel, "I'm already keeping quiet."));
+                    Ok(Disposition::Handled)
+                }
+            }
         } else {
             Ok(Disposition::Unhandled)
+        }
+    }
+
+    fn periodic(&mut self, cli: &mut slack::RtmClient) {
+        match self.last {
+            None => {
+                debug!("Not running");
+                return;
+            },
+            Some(last) => {
+                debug!("Running");
+                let now = UTC::now();
+                let next = self.schedule.next_utc_after(&last);
+                debug!("Last and next set");
+                match next {
+                    Some(next) => {
+                        debug!("Next exists");
+                        if next < now {
+                            info!("Triggered");
+                            self.last = Some(next);
+                        } else {
+                            info!("Waiting until ready ({}, {})", next, now);
+                        }
+                    },
+                    None => {
+                        debug!("Next doesn't exist");
+                        self.last = None;
+                    }
+                }
+            }
         }
     }
 }

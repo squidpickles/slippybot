@@ -24,4 +24,7 @@ impl Command for HowAreYou {
             Ok(Disposition::Unhandled)
         }
     }
+
+    fn periodic(&mut self, _: &mut slack::RtmClient) {
+    }
 }

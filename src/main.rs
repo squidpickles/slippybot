@@ -39,6 +39,7 @@ impl slack::EventHandler for SlippyHandler {
                 cli: &mut slack::RtmClient,
                 event: Result<&slack::Event, slack::Error>,
                 raw_json: &str) {
+        debug!("on_event()");
         match *(event.unwrap()) {
             slack::Event::Message(ref msg) => {
                 match *msg {
@@ -68,8 +69,9 @@ impl slack::EventHandler for SlippyHandler {
         }
     }
 
-    fn on_ping(&mut self, _: &mut slack::RtmClient) {
+    fn on_ping(&mut self, cli: &mut slack::RtmClient) {
         debug!("on_ping()");
+        self.brain.periodic(cli);
     }
 
     fn on_close(&mut self, _: &mut slack::RtmClient) {

@@ -24,4 +24,7 @@ impl Command for Hello {
             Ok(Disposition::Unhandled)
         }
     }
+
+    fn periodic(&mut self, _: &mut slack::RtmClient) {
+    }
 }
