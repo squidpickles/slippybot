@@ -1,0 +1,13 @@
+[Unit]
+Description=Slippy Slack bot
+After=network.target
+
+[Service]
+ExecStart=/home/sweetpea/dev/slippybot/target/release/slippybot
+KillMode=process
+Restart=always
+RestartSec=30
+WorkingDirectory=/home/sweetpea/dev/slippybot
+
+[Install]
+WantedBy=default.target

@@ -95,11 +95,11 @@ impl slack::EventHandler for SlippyHandler {
     }
 
     fn on_close(&mut self, _: &mut slack::RtmClient) {
-        info!("on_close()");
+        debug!("on_close()");
     }
 
     fn on_connect(&mut self, cli: &mut slack::RtmClient) {
-        info!("on_connect()");
+        info!("Connected");
         self.my_name = cli.get_name();
         self.my_id = cli.get_id();
         if let Some(ref my_name) = self.my_name {
