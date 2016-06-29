@@ -26,7 +26,7 @@ impl SlippyBrain {
             commands: vec![
                 Box::new(Hello::new()),
                 Box::new(HowAreYou::new()),
-                Box::new(Joy::new()),
+                Box::new(Joy::new(true)),
             ],
         }
     }

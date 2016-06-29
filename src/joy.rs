@@ -43,13 +43,17 @@ pub struct Joy {
 }
 
 impl Joy {
-    pub fn new() -> Joy {
+    pub fn new(enabled_on_startup: bool) -> Joy {
         let joy_list = JoyList::load(JOY_LIST_FILE).unwrap();
+        let last = match enabled_on_startup {
+            true => Some(UTC::now() - Duration::minutes(1)),
+            false => None
+        };
         Joy {
             start_pattern: Regex::new(r"(?i)joy start").unwrap(),
             stop_pattern: Regex::new(r"(?i)joy stop").unwrap(),
             schedule: CronSchedule::parse(NOTIFY_SCHEDULE).unwrap(),
-            last: None,
+            last: last,
             list: joy_list,
         }
     }
