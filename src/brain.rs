@@ -4,6 +4,7 @@ use how_are_you::HowAreYou;
 use hello::Hello;
 use joy::Joy;
 
+#[allow(dead_code)]
 pub enum Disposition {
     Handled,
     Unhandled,
@@ -51,6 +52,7 @@ impl SlippyBrain {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn im(&self, cli: &mut slack::RtmClient, text: &str, user_id: &str) -> Result<(), error::Error> {
         let im = try!(cli.im_open(user_id));
         try!(cli.send_message(&im.channel.id, text));
