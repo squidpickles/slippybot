@@ -14,7 +14,7 @@ use rand::{self, Rng};
 const NOTIFY_SCHEDULE: &'static str = "0-59 0-23 1-31 1-12 0-7 2000-3000";
 const NOTIFY_ROOM: &'static str = "#slippybottest";
 const JOY_LIST_FILE: &'static str = "joy.json";
-const JOY_PREFIX: &'static str = "A reminder to preserve the Joy: ";
+const JOY_PREFIX: &'static str = "Slippy says: ";
 
 #[derive(RustcDecodable, RustcEncodable, Debug)]
 pub struct JoyList {
@@ -60,7 +60,7 @@ impl Command for Joy {
         if self.start_pattern.is_match(text) {
             match self.last {
                 Some(_) => {
-                    try!(cli.send_message(channel, "I'm already full of joy!"));
+                    try!(cli.send_message(channel, "I'm already spouting joy!"));
                     Ok(Disposition::Handled)
                 },
                 None => {
