@@ -5,6 +5,8 @@ extern crate log;
 extern crate env_logger;
 extern crate cron;
 extern crate chrono;
+extern crate rustc_serialize;
+extern crate rand;
 mod error;
 mod brain;
 mod hello;
