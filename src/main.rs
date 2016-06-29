@@ -15,6 +15,7 @@ mod joy;
 
 use regex::Regex;
 use brain::SlippyBrain;
+use rustc_serialize::json::Json;
 
 const API_KEY: &'static str = "***REMOVED***";
 
@@ -49,6 +50,22 @@ impl slack::EventHandler for SlippyHandler {
                         if let Some(ref txt) = *text {
                             info!("Message: {}", txt);
                             debug!("{}", raw_json);
+                            match Json::from_str(raw_json) {
+                                Ok(raw_msg) => {
+                                    match raw_msg.as_object() {
+                                        Some(raw_msg_object) => {
+                                            match raw_msg_object.get("reply_to") {
+                                                Some(_) => {
+                                                    return; // re-sent message after disconnection; ignore
+                                                },
+                                                None => {}
+                                            }
+                                        },
+                                        None => {}
+                                    }
+                                },
+                                Err(err) => error!("Error parsing raw JSON message: {}", err),
+                            }
                             if let Some(ref re) = self.me_finder {
                                 if let Some(ref chan) = *channel {
                                     if re.is_match(txt) || chan.starts_with("D") {
@@ -63,6 +80,7 @@ impl slack::EventHandler for SlippyHandler {
                             }
                         }
                     },
+
                     _ => {
                     }
                 }

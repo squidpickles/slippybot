@@ -11,8 +11,8 @@ use std::fs::File;
 use std::io::Read;
 use rand::{self, Rng};
 
-const NOTIFY_SCHEDULE: &'static str = "0-59 0-23 1-31 1-12 0-7 2000-3000";
-const NOTIFY_ROOM: &'static str = "#slippybottest";
+const NOTIFY_SCHEDULE: &'static str = "0 20 1-31 1-12 2 2000-3000"; // time is UTC
+const NOTIFY_ROOM: &'static str = "#general";
 const JOY_LIST_FILE: &'static str = "joy.json";
 const JOY_PREFIX: &'static str = "Slippy says: ";
 
@@ -53,6 +53,14 @@ impl Joy {
             list: joy_list,
         }
     }
+
+    pub fn start(&mut self) {
+        self.last = Some(UTC::now() - Duration::minutes(1)); // cron scheduler always adds a minute for some reason
+    }
+
+    pub fn stop(&mut self) {
+        self.last = None;
+    }
 }
 
 impl Command for Joy {
@@ -64,7 +72,7 @@ impl Command for Joy {
                     Ok(Disposition::Handled)
                 },
                 None => {
-                    self.last = Some(UTC::now() - Duration::minutes(1)); // cron scheduler always adds a minute for some reason
+                    self.start();
                     try!(cli.send_message(channel, "I won't let you down."));
                     Ok(Disposition::Handled)
                 }
@@ -72,7 +80,7 @@ impl Command for Joy {
         } else if self.stop_pattern.is_match(text) {
             match self.last {
                 Some(_) => {
-                    self.last = None;
+                    self.stop();
                     try!(cli.send_message(channel, "I'll stop saying stuff."));
                     Ok(Disposition::Handled)
                 },
@@ -112,7 +120,7 @@ impl Command for Joy {
                     },
                     None => {
                         debug!("No more dates; stopping");
-                        self.last = None;
+                        self.stop();
                     }
                 }
             }
