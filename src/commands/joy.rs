@@ -51,8 +51,8 @@ impl Joy {
             false => None
         };
         Joy {
-            start_pattern: Regex::new(r"(?i)joy start").unwrap(),
-            stop_pattern: Regex::new(r"(?i)joy stop").unwrap(),
+            start_pattern: Regex::new(r"(?i)start joy").unwrap(),
+            stop_pattern: Regex::new(r"(?i)stop joy").unwrap(),
             now_pattern: Regex::new(r"(?i)joy now").unwrap(),
             schedule: CronSchedule::parse(NOTIFY_SCHEDULE).unwrap(),
             last: last,
@@ -150,7 +150,7 @@ impl Command for Joy {
     }
 
     fn usage(&self) -> &'static str {
-        "`joy start` or `joy stop` or `joy now`"
+        "`start`/`stop` `joy` or `joy now`"
     }
 
     fn description(&self) -> &'static str {

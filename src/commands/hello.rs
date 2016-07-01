@@ -29,7 +29,7 @@ impl Command for Hello {
     }
 
     fn usage(&self) -> &'static str {
-        "`hi` or `hello`"
+        "`hi`/`hello`"
     }
 
     fn description(&self) -> &'static str {

@@ -29,7 +29,7 @@ impl Command for Thanks {
     }
 
     fn usage(&self) -> &'static str {
-        "`thanks` or `thank you`"
+        "`thanks`/`thank you`"
     }
 
     fn description(&self) -> &'static str {
