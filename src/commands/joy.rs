@@ -126,7 +126,7 @@ impl Command for Joy {
                             });
                             self.last = Some(next);
                         } else {
-                            info!("Waiting until ready ({} -> {})", now, next);
+                            debug!("Waiting until ready ({} -> {})", now, next);
                         }
                     },
                     None => {
