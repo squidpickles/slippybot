@@ -31,7 +31,7 @@ impl SlippyBrain {
                 Box::new(how_are_you::HowAreYou::new()),
                 Box::new(joy::Joy::new(true)),
             ],
-            help_pattern: Regex::new(r"(?i)^help\b").unwrap(),
+            help_pattern: Regex::new(r"(?i)\bhelp\b").unwrap(),
         }
     }
 
