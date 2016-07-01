@@ -1,9 +1,6 @@
 use slack;
 use error;
-use how_are_you::HowAreYou;
-use hello::Hello;
-use thanks::Thanks;
-use joy::Joy;
+use commands::*;
 use regex::Regex;
 
 #[allow(dead_code)]
@@ -29,10 +26,10 @@ impl SlippyBrain {
     pub fn new() -> SlippyBrain {
         SlippyBrain {
             commands: vec![
-                Box::new(Hello::new()),
-                Box::new(Thanks::new()),
-                Box::new(HowAreYou::new()),
-                Box::new(Joy::new(true)),
+                Box::new(hello::Hello::new()),
+                Box::new(thanks::Thanks::new()),
+                Box::new(how_are_you::HowAreYou::new()),
+                Box::new(joy::Joy::new(true)),
             ],
             help_pattern: Regex::new(r"(?i)^help\b").unwrap(),
         }
@@ -63,7 +60,7 @@ impl SlippyBrain {
             }
         }
         if !handled {
-            try!(cli.send_message(channel, "Can you try speaking Horse? (You can ask for _help_)"));
+            try!(cli.send_message(channel, "Can you try speaking Horse? (a hint: you can ask for `help`)"));
         }
         Ok(())
     }

@@ -7,12 +7,9 @@ extern crate cron;
 extern crate chrono;
 extern crate rustc_serialize;
 extern crate rand;
-mod error;
 mod brain;
-mod how_are_you;
-mod joy;
-mod hello;
-mod thanks;
+mod error;
+mod commands;
 
 use regex::Regex;
 use brain::SlippyBrain;
