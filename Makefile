@@ -4,7 +4,7 @@ build:
 	cargo build --release
 
 run:
-	target/release/slippybot
+	env RUST_LOG=slippybot=debug target/release/slippybot
 
 install:
 	systemctl --user enable slippybot

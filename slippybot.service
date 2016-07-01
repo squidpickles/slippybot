@@ -8,6 +8,7 @@ KillMode=process
 Restart=always
 RestartSec=30
 WorkingDirectory=/home/sweetpea/dev/slippybot
+Environment="RUST_LOG=slippybot=info"
 
 [Install]
 WantedBy=default.target
