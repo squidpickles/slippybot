@@ -2,7 +2,7 @@ use slack;
 use error;
 use brain::{Command, Disposition};
 use cron::CronSchedule;
-use chrono::{UTC, Duration};
+use chrono::{UTC, Local, Duration, TimeZone};
 use chrono::datetime::DateTime;
 use regex::Regex;
 use rustc_serialize::json;
@@ -71,8 +71,15 @@ impl Command for Joy {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, _: &str, channel: &str) -> Result<Disposition, error::Error> {
         if self.start_pattern.is_match(text) {
             match self.last {
-                Some(_) => {
-                    try!(cli.send_message(channel, "I'm already spouting joy!"));
+                Some(ref last) => {
+                    let next_announcement = match self.schedule.next_utc_after(last) {
+                        Some(next) => {
+                            let local = Local.from_utc_datetime(&next.naive_local());
+                            local.format("%A, %B %e, at %l:%M %p").to_string()
+                        },
+                        None => "Hmm, looks like never".to_string(),
+                    };
+                    try!(cli.send_message(channel, &format!("I'm already spouting joy. (You'll next hear from me on *{}*)", next_announcement)));
                     Ok(Disposition::Handled)
                 },
                 None => {
@@ -123,11 +130,19 @@ impl Command for Joy {
                         }
                     },
                     None => {
-                        debug!("No more dates; stopping");
+                        warn!("No more dates. This should never happen!");
                         self.stop();
                     }
                 }
             }
         }
+    }
+
+    fn usage(&self) -> &'static str {
+        "`joy start` or `joy stop`"
+    }
+
+    fn description(&self) -> &'static str {
+        "Starts or stops me announcing ways to preserve the joy"
     }
 }

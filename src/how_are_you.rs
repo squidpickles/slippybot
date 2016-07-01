@@ -27,4 +27,12 @@ impl Command for HowAreYou {
 
     fn periodic(&mut self, _: &mut slack::RtmClient) {
     }
+
+    fn usage(&self) -> &'static str {
+        "`how are you`"
+    }
+
+    fn description(&self) -> &'static str {
+        "Asks me how I'm doing, to which I'll reply"
+    }
 }

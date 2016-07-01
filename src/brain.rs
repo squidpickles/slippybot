@@ -2,7 +2,9 @@ use slack;
 use error;
 use how_are_you::HowAreYou;
 use hello::Hello;
+use thanks::Thanks;
 use joy::Joy;
+use regex::Regex;
 
 #[allow(dead_code)]
 pub enum Disposition {
@@ -14,10 +16,13 @@ pub enum Disposition {
 pub trait Command {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, user_id: &str, channel: &str) -> Result<Disposition, error::Error>;
     fn periodic(&mut self, cli: &mut slack::RtmClient);
+    fn usage(&self) -> &'static str;
+    fn description(&self) -> &'static str;
 }
 
 pub struct SlippyBrain {
     commands: Vec<Box<Command>>,
+    help_pattern: Regex,
 }
 
 impl SlippyBrain {
@@ -25,9 +30,11 @@ impl SlippyBrain {
         SlippyBrain {
             commands: vec![
                 Box::new(Hello::new()),
+                Box::new(Thanks::new()),
                 Box::new(HowAreYou::new()),
                 Box::new(Joy::new(true)),
             ],
+            help_pattern: Regex::new(r"(?i)^help\b").unwrap(),
         }
     }
 
@@ -39,6 +46,15 @@ impl SlippyBrain {
 
     pub fn interpret(&mut self, cli: &mut slack::RtmClient, text: &str, user_id: &str, channel: &str) -> Result<(), error::Error> {
         let mut handled = false;
+        // check for help command
+        if self.help_pattern.is_match(text) {
+            let mut help_message = "Things I understand:\n*`help`* - _Prints this message_".to_string();
+            for command in self.commands.iter() {
+                help_message.push_str(&format!("\n*{}* - _{}_", command.usage(), command.description()));
+            }
+            try!(cli.send_message(channel, &help_message));
+            handled = true;
+        }
         for command in self.commands.iter_mut() {
             match try!(command.handle(cli, text, user_id, channel)) {
                 Disposition::Handled => handled = true,
@@ -47,7 +63,7 @@ impl SlippyBrain {
             }
         }
         if !handled {
-            try!(cli.send_message(channel, "Can you try speaking Horse?"));
+            try!(cli.send_message(channel, "Can you try speaking Horse? (You can ask for _help_)"));
         }
         Ok(())
     }

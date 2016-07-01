@@ -9,9 +9,10 @@ extern crate rustc_serialize;
 extern crate rand;
 mod error;
 mod brain;
-mod hello;
 mod how_are_you;
 mod joy;
+mod hello;
+mod thanks;
 
 use regex::Regex;
 use brain::SlippyBrain;
