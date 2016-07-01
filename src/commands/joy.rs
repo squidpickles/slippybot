@@ -37,6 +37,7 @@ impl JoyList {
 pub struct Joy {
     start_pattern: Regex,
     stop_pattern: Regex,
+    now_pattern: Regex,
     schedule: CronSchedule,
     last: Option<DateTime<UTC>>,
     list: JoyList,
@@ -52,6 +53,7 @@ impl Joy {
         Joy {
             start_pattern: Regex::new(r"(?i)joy start").unwrap(),
             stop_pattern: Regex::new(r"(?i)joy stop").unwrap(),
+            now_pattern: Regex::new(r"(?i)joy now").unwrap(),
             schedule: CronSchedule::parse(NOTIFY_SCHEDULE).unwrap(),
             last: last,
             list: joy_list,
@@ -65,6 +67,15 @@ impl Joy {
     pub fn stop(&mut self) {
         self.last = None;
     }
+
+    fn send_joy(&self, cli: &mut slack::RtmClient, channel: &str) -> Result<(), error::Error> {
+        let chosen = self.list.choose();
+        info!("Posting joy: {}", chosen);
+        let message = format!("{}{}", JOY_PREFIX, chosen);
+        try!(cli.send_message(channel, &message));
+        Ok(())
+    }
+
 }
 
 impl Command for Joy {
@@ -100,6 +111,9 @@ impl Command for Joy {
                     Ok(Disposition::Handled)
                 }
             }
+        } else if self.now_pattern.is_match(text) {
+            try!(self.send_joy(cli, channel));
+            Ok(Disposition::Handled)
         } else {
             Ok(Disposition::Unhandled)
         }
@@ -117,12 +131,9 @@ impl Command for Joy {
                 match next {
                     Some(next) => {
                         if next < now {
-                            let chosen = self.list.choose();
-                            info!("Posting joy: {}", chosen);
-                            let message = format!("{}{}", JOY_PREFIX, chosen);
-                            cli.send_message(NOTIFY_ROOM, &message).unwrap_or_else(|err| {
-                                error!("Error posting joy to room: {}", err);
-                                0
+                            self.send_joy(cli, NOTIFY_ROOM).unwrap_or_else(|err| {
+                                error!("Error sending joy: {}", err);
+                                ()
                             });
                             self.last = Some(next);
                         } else {
@@ -139,10 +150,10 @@ impl Command for Joy {
     }
 
     fn usage(&self) -> &'static str {
-        "`joy start` or `joy stop`"
+        "`joy start` or `joy stop` or `joy now`"
     }
 
     fn description(&self) -> &'static str {
-        "Starts or stops me announcing ways to preserve the joy"
+        "Starts or stops me announcing ways to preserve the joy. (Or says one right now)"
     }
 }
