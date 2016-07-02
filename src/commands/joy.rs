@@ -11,7 +11,7 @@ use std::fs::File;
 use std::io::Read;
 use rand::{self, Rng};
 
-const NOTIFY_SCHEDULE: &'static str = "0 20 1-31 1-12 2 2000-3000"; // time is UTC
+const NOTIFY_SCHEDULE: &'static str = "0 20 1,4,7,10,13,16,19,21,24,27,30 1-12 2 2000-3000"; // time is UTC
 const NOTIFY_ROOM: &'static str = "#general";
 const JOY_LIST_FILE: &'static str = "joy.json";
 const JOY_PREFIX: &'static str = "Slippy says: ";
