@@ -7,15 +7,17 @@ extern crate cron;
 extern crate chrono;
 extern crate rustc_serialize;
 extern crate rand;
+mod config;
 mod brain;
 mod error;
 mod commands;
 
+use config::Configuration;
 use regex::Regex;
 use brain::SlippyBrain;
 use rustc_serialize::json::Json;
 
-const API_KEY: &'static str = "***REMOVED***";
+const CONFIG_FILE: &'static str = "slippybot.conf";
 
 struct SlippyHandler {
     brain: SlippyBrain,
@@ -112,6 +114,7 @@ impl slack::EventHandler for SlippyHandler {
 fn main() {
     env_logger::init().unwrap();
     let mut handler = SlippyHandler::new();
-    let mut cli = slack::RtmClient::new(&API_KEY);
+    let config = Configuration::load(CONFIG_FILE).unwrap();
+    let mut cli = slack::RtmClient::new(config.api_key());
     cli.login_and_run(&mut handler).unwrap();
 }
