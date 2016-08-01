@@ -104,7 +104,7 @@ impl slack::EventHandler for SlippyHandler {
         self.my_id = cli.get_id();
         if let Some(ref my_name) = self.my_name {
             if let Some(ref my_id) = self.my_id {
-                let regex_str = format!(r"(?i)({})|(@{})", my_name, my_id);
+                let regex_str = format!(r"(?i)(?<!:){}|@{}", my_name, my_id);
                 self.me_finder = Regex::new(&regex_str).ok();
             }
         }
