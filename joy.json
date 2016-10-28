@@ -1,30 +1,43 @@
 {
-	"items": [
+	"Guests": [
 		"Show guests the Joy list",
-		"Long term guests should contribute to the grocery fund; they should send an email for transparency.",
-		"When you travel out of town, make arrangements for your chores to be done.",
+		"Long term guests should contribute to the grocery fund; they should send an email for transparency."
+	],
+	"Travel": [
+		"When you travel out of town, make arrangements for your chores to be done."
+	],
+	"Conservation": [
 		"Keep water waste to an absolute minimum (e.g. if it's yellow, let it mellow; take short showers).",
-		"Turn off lights if they're not needed.",
-		"Store food in the fridge in covered transparent containers.",
-		"Label the contents of leftovers, especially those with meat.",
-		"Heed fridge organization labels.",
-		"Keep pots, knives, and other sharp items out of the dishwasher.",
-		"Keep sharp items out of the drying rack. Knives can go on the magnetic holder while still wet.",
-		"Use knives only on cutting boards, not on glass, metal, or the counter.",
-		"Don't use metal on metal (e.g. metal spoons in metal pots).",
-		"Squeeze water out of sponges after use and put them on the windowsill, not the counter.",
-		"Be vigilant about fruit flies and ants; cover food, especially sweets, and close the compost bin lid.",
-		"Clean up after yourself. Wipe down counters and table, and keep the sink free of dishes.",
+		"Turn off lights if they're not needed."
+	],
+	"Meals and Food": [
 		"After dinner, everyone pitches in to clean up. That includes counters, leftovers, dishes, and sweeping.",
+		"Label the contents of leftovers, especially those with meat.",
+		"Store food in the fridge in covered transparent containers.",
+		"Heed fridge organization labels.",
+		"Chew with your mouth closed."
+	],
+	"Kitchen": [
+		"Clean up after yourself. Wipe down counters and table, and keep the sink free of dishes.",
+		"Squeeze water out of sponges after use and put them on the windowsill, not the counter.",
+		"Keep pots, knives, and other sharp items out of the dishwasher.",
+		"Use knives only on cutting boards, not on glass, metal, or the counter.",
+		"Be vigilant about fruit flies and ants; cover food, especially sweets, and close the compost bin lid.",
+		"Keep sharp items out of the drying rack. Knives can go on the magnetic holder while still wet.",
+		"Don't use metal on metal (e.g. metal spoons in metal pots)."
+	],
+	"Around the Horse": [
 		"Sit down when you pee.",
-		"Clean the lint out of the dryer lint trap.",
 		"Clean the hair out of the shower and sink drains.",
-		"Be security smart: lock the front door when nobody is upstairs, and lock windows/sliding door when you go out.",
-		"Always deadbolt Lysandra's door.",
 		"Open and close doors quietly, with care. Especially pay attention in downstairs bedrooms and the bathroom.",
+		"Minimize personal belongings you keep in common space, especially fragile items like instruments."
+	],
+	"Security": [
+		"Always deadbolt Lysandra's door.",
+		"Be security smart: lock the front door when nobody is upstairs, and lock windows/sliding door when you go out."
+	],
+	"Peace of Mind": [
 		"Be mindful in the morning. (Quiet, please.)",
-		"Chew with your mouth closed.",
-		"Reduce the amount of personal belongings you keep in common space, especially fragile items like instruments.",
-		"Don't share Melissa's Essex code with anyone."
+		"Don't share Melissa's Essex code with anyone (lest we lose access due to misuse by your friends' friends' friends)."
 	]
 }

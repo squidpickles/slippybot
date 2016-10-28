@@ -4,8 +4,8 @@ extern crate regex;
 extern crate env_logger;
 extern crate cron;
 extern crate chrono;
-extern crate rustc_serialize;
 extern crate rand;
+extern crate serde_json;
 
 mod config;
 mod brain;
@@ -15,7 +15,6 @@ mod commands;
 use config::Configuration;
 use regex::Regex;
 use brain::SlippyBrain;
-use rustc_serialize::json::Json;
 
 const CONFIG_FILE: &'static str = "slippybot.conf";
 
@@ -48,7 +47,8 @@ impl slack::EventHandler for SlippyHandler {
                 if let Some(ref txt) = *text {
                     info!("Message: {}", txt);
                     debug!("{}", raw_json);
-                    match Json::from_str(raw_json) {
+                    /*
+                    match serde_json::from_str(raw_json) {
                         Ok(raw_msg) => {
                             if let Some(raw_msg_object) = raw_msg.as_object() {
                                 if raw_msg_object.get("reply_to").is_some() {
@@ -58,6 +58,7 @@ impl slack::EventHandler for SlippyHandler {
                         },
                         Err(err) => error!("Error parsing raw JSON message: {}", err),
                     }
+                    */
                     if let Some(ref re) = self.me_finder {
                         if let Some(ref chan) = *channel {
                             if re.is_match(txt) || chan.starts_with('D') {

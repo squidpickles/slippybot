@@ -5,10 +5,10 @@ use cron::CronSchedule;
 use chrono::{UTC, Local, Duration, TimeZone};
 use chrono::datetime::DateTime;
 use regex::Regex;
-use rustc_serialize::json;
+use serde_json;
 use std::path::Path;
 use std::fs::File;
-use std::io::Read;
+use std::collections::BTreeMap;
 use rand::{self, Rng};
 
 const NOTIFY_SCHEDULE: &'static str = "0 20 1,4,7,10,13,16,19,21,24,27,30 1-12 2 2000-3000"; // time is UTC
@@ -16,21 +16,24 @@ const NOTIFY_ROOM: &'static str = "#general";
 const JOY_LIST_FILE: &'static str = "joy.json";
 const JOY_PREFIX: &'static str = "Slippy says: ";
 
-#[derive(RustcDecodable, RustcEncodable, Debug)]
 pub struct JoyList {
-    items: Vec<String>,
+    items: BTreeMap<String, Vec<String>>,
 }
 
 impl JoyList {
     fn load<P: AsRef<Path>>(path: P) -> Result<JoyList, error::Error> {
-        let mut file = try!(File::open(path));
-        let mut data = String::new();
-        try!(file.read_to_string(&mut data));
-        Ok(try!(json::decode(&data)))
+        let file = try!(File::open(path));
+        let joy = try!(serde_json::from_reader(file));
+        Ok(JoyList {
+            items: joy,
+        })
     }
 
     fn choose(&self) -> &str {
-        rand::thread_rng().choose(&self.items).unwrap()
+        let mut rng = rand::thread_rng();
+        let section_idx = rng.gen_range(0, self.items.len());
+        let section = self.items.values().nth(section_idx).unwrap();
+        rng.choose(section).unwrap()
     }
 }
 
