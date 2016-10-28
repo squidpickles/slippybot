@@ -36,23 +36,24 @@ impl SlippyBrain {
     }
 
     pub fn periodic(&mut self, cli: &mut slack::RtmClient) {
-        for task in self.commands.iter_mut() {
+        for task in &mut self.commands {
             task.periodic(cli);
         }
     }
 
     pub fn interpret(&mut self, cli: &mut slack::RtmClient, text: &str, user_id: &str, channel: &str) -> Result<(), error::Error> {
-        let mut handled = false;
         // check for help command
-        if self.help_pattern.is_match(text) {
+        let mut handled = if self.help_pattern.is_match(text) {
             let mut help_message = "Things I understand:\n*`help`* - _Prints this message_".to_string();
-            for command in self.commands.iter() {
+            for command in &self.commands {
                 help_message.push_str(&format!("\n*{}* - _{}_", command.usage(), command.description()));
             }
             try!(cli.send_message(channel, &help_message));
-            handled = true;
-        }
-        for command in self.commands.iter_mut() {
+            true
+        } else {
+            false
+        };
+        for command in &mut self.commands {
             match try!(command.handle(cli, text, user_id, channel)) {
                 Disposition::Handled => handled = true,
                 Disposition::Unhandled => {},

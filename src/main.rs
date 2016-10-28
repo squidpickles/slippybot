@@ -1,12 +1,12 @@
 extern crate slack;
 extern crate regex;
-#[macro_use]
-extern crate log;
+#[macro_use] extern crate log;
 extern crate env_logger;
 extern crate cron;
 extern crate chrono;
 extern crate rustc_serialize;
 extern crate rand;
+
 mod config;
 mod brain;
 mod error;
@@ -43,49 +43,35 @@ impl slack::EventHandler for SlippyHandler {
                 event: Result<&slack::Event, slack::Error>,
                 raw_json: &str) {
         debug!("on_event()");
-        match *(event.unwrap()) {
-            slack::Event::Message(ref msg) => {
-                match *msg {
-                    slack::Message::Standard { ref channel, ref text, ref user, ..  } => {
-                        if let Some(ref txt) = *text {
-                            info!("Message: {}", txt);
-                            debug!("{}", raw_json);
-                            match Json::from_str(raw_json) {
-                                Ok(raw_msg) => {
-                                    match raw_msg.as_object() {
-                                        Some(raw_msg_object) => {
-                                            match raw_msg_object.get("reply_to") {
-                                                Some(_) => {
-                                                    return; // re-sent message after disconnection; ignore
-                                                },
-                                                None => {}
-                                            }
-                                        },
-                                        None => {}
-                                    }
-                                },
-                                Err(err) => error!("Error parsing raw JSON message: {}", err),
+        if let slack::Event::Message(ref msg) = *(event.unwrap()) {
+            if let slack::Message::Standard { ref channel, ref text, ref user, .. } = *msg {
+                if let Some(ref txt) = *text {
+                    info!("Message: {}", txt);
+                    debug!("{}", raw_json);
+                    match Json::from_str(raw_json) {
+                        Ok(raw_msg) => {
+                            if let Some(raw_msg_object) = raw_msg.as_object() {
+                                if raw_msg_object.get("reply_to").is_some() {
+                                    return;
+                                }
                             }
-                            if let Some(ref re) = self.me_finder {
-                                if let Some(ref chan) = *channel {
-                                    if re.is_match(txt) || chan.starts_with("D") {
-                                        if let Some(ref user_id) = *user {
-                                            match self.brain.interpret(cli, txt, user_id, chan) {
-                                                Ok(_) => {},
-                                                Err(err) => error!("Error interpreting message: {}", err),
-                                            }
-                                        }
+                        },
+                        Err(err) => error!("Error parsing raw JSON message: {}", err),
+                    }
+                    if let Some(ref re) = self.me_finder {
+                        if let Some(ref chan) = *channel {
+                            if re.is_match(txt) || chan.starts_with('D') {
+                                if let Some(ref user_id) = *user {
+                                    match self.brain.interpret(cli, txt, user_id, chan) {
+                                        Ok(_) => {},
+                                        Err(err) => error!("Error interpreting message: {}", err),
                                     }
                                 }
                             }
                         }
-                    },
-
-                    _ => {
                     }
                 }
             }
-            _ => {}
         }
     }
 

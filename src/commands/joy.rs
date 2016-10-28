@@ -46,9 +46,10 @@ pub struct Joy {
 impl Joy {
     pub fn new(enabled_on_startup: bool) -> Joy {
         let joy_list = JoyList::load(JOY_LIST_FILE).unwrap();
-        let last = match enabled_on_startup {
-            true => Some(UTC::now() - Duration::minutes(1)),
-            false => None
+        let last = if enabled_on_startup {
+            Some(UTC::now() - Duration::minutes(1))
+        } else {
+            None
         };
         Joy {
             start_pattern: Regex::new(r"(?i)start joy").unwrap(),
