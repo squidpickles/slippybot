@@ -47,18 +47,10 @@ impl slack::EventHandler for SlippyHandler {
                 if let Some(ref txt) = *text {
                     info!("Message: {}", txt);
                     debug!("{}", raw_json);
-                    /*
-                    match serde_json::from_str(raw_json) {
-                        Ok(raw_msg) => {
-                            if let Some(raw_msg_object) = raw_msg.as_object() {
-                                if raw_msg_object.get("reply_to").is_some() {
-                                    return;
-                                }
-                            }
-                        },
-                        Err(err) => error!("Error parsing raw JSON message: {}", err),
+                    if raw_json.contains("\"reply_to\"") {
+                        debug!("Skipping reply message");
+                        return;
                     }
-                    */
                     if let Some(ref re) = self.me_finder {
                         if let Some(ref chan) = *channel {
                             if re.is_match(txt) || chan.starts_with('D') {
