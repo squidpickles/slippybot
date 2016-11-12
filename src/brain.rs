@@ -48,28 +48,28 @@ impl SlippyBrain {
             for command in &self.commands {
                 help_message.push_str(&format!("\n*{}* - _{}_", command.usage(), command.description()));
             }
-            try!(cli.send_message(channel, &help_message));
+            cli.send_message(channel, &help_message)?;
             true
         } else {
             false
         };
         for command in &mut self.commands {
-            match try!(command.handle(cli, text, user_id, channel)) {
+            match command.handle(cli, text, user_id, channel)? {
                 Disposition::Handled => handled = true,
                 Disposition::Unhandled => {},
                 Disposition::Terminal => return Ok(()),
             }
         }
         if !handled {
-            try!(cli.send_message(channel, "Can you try speaking Horse? (a hint: you can ask for `help`)"));
+            cli.send_message(channel, "Can you try speaking Horse? (a hint: you can ask for `help`)")?;
         }
         Ok(())
     }
 
     #[allow(dead_code)]
     pub fn im(&self, cli: &mut slack::RtmClient, text: &str, user_id: &str) -> Result<(), error::Error> {
-        let im = try!(cli.im_open(user_id));
-        try!(cli.send_message(&im.channel.id, text));
+        let im = cli.im_open(user_id)?;
+        cli.send_message(&im.channel.id, text)?;
         Ok(())
     }
 }

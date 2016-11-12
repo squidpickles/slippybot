@@ -18,7 +18,7 @@ impl Thanks {
 impl Command for Thanks {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, _: &str, channel: &str) -> Result<Disposition, error::Error> {
         if self.pattern.is_match(text) {
-            try!(cli.send_message(channel, "You're welcome!"));
+            cli.send_message(channel, "You're welcome!")?;
             Ok(Disposition::Handled)
         } else {
             Ok(Disposition::Unhandled)

@@ -22,8 +22,8 @@ pub struct JoyList {
 
 impl JoyList {
     fn load<P: AsRef<Path>>(path: P) -> Result<JoyList, error::Error> {
-        let file = try!(File::open(path));
-        let joy = try!(serde_json::from_reader(file));
+        let file = File::open(path)?;
+        let joy = serde_json::from_reader(file)?;
         Ok(JoyList {
             items: joy,
         })
@@ -76,7 +76,7 @@ impl Joy {
         let chosen = self.list.choose();
         info!("Posting joy: {}", chosen);
         let message = format!("{}{}", JOY_PREFIX, chosen);
-        try!(cli.send_message(channel, &message));
+        cli.send_message(channel, &message)?;
         Ok(())
     }
 
@@ -94,12 +94,12 @@ impl Command for Joy {
                         },
                         None => "Hmm, looks like never".to_string(),
                     };
-                    try!(cli.send_message(channel, &format!("I'm already spouting joy. (You'll next hear from me on *{}*)", next_announcement)));
+                    cli.send_message(channel, &format!("I'm already spouting joy. (You'll next hear from me on *{}*)", next_announcement))?;
                     Ok(Disposition::Handled)
                 },
                 None => {
                     self.start();
-                    try!(cli.send_message(channel, "I won't let you down."));
+                    cli.send_message(channel, "I won't let you down.")?;
                     Ok(Disposition::Handled)
                 }
             }
@@ -107,16 +107,16 @@ impl Command for Joy {
             match self.last {
                 Some(_) => {
                     self.stop();
-                    try!(cli.send_message(channel, "I'll stop saying stuff."));
+                    cli.send_message(channel, "I'll stop saying stuff.")?;
                     Ok(Disposition::Handled)
                 },
                 None => {
-                    try!(cli.send_message(channel, "I'm already keeping quiet."));
+                    cli.send_message(channel, "I'm already keeping quiet.")?;
                     Ok(Disposition::Handled)
                 }
             }
         } else if self.now_pattern.is_match(text) {
-            try!(self.send_joy(cli, channel));
+            self.send_joy(cli, channel)?;
             Ok(Disposition::Handled)
         } else {
             Ok(Disposition::Unhandled)

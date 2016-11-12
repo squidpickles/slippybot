@@ -11,8 +11,8 @@ pub struct Configuration {
 
 impl Configuration {
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Configuration, error::Error> {
-        let file = try!(File::open(path));
-        let mut config: BTreeMap<String, String> = try!(serde_json::from_reader(file));
+        let file = File::open(path)?;
+        let mut config: BTreeMap<String, String> = serde_json::from_reader(file)?;
         match config.remove("api_key") {
             Some(api_key) => {
                 Ok(Configuration{api_key: api_key })

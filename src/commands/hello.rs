@@ -18,7 +18,7 @@ impl Hello {
 impl Command for Hello {
     fn handle(&mut self, cli: &mut slack::RtmClient, text: &str, _: &str, channel: &str) -> Result<Disposition, error::Error> {
         if self.pattern.is_match(text) {
-            try!(cli.send_message(channel, "Hello to you"));
+            cli.send_message(channel, "Hello to you")?;
             Ok(Disposition::Handled)
         } else {
             Ok(Disposition::Unhandled)
