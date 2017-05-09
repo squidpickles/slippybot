@@ -2,26 +2,17 @@ use error;
 use serde_json;
 use std::path::Path;
 use std::fs::File;
-use std::collections::BTreeMap;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Configuration {
-    api_key: String,
+    pub api_key: String,
+    pub interval: u64,
 }
 
 impl Configuration {
     pub fn load<P: AsRef<Path>>(path: P) -> Result<Configuration, error::Error> {
         let file = File::open(path)?;
-        let mut config: BTreeMap<String, String> = serde_json::from_reader(file)?;
-        match config.remove("api_key") {
-            Some(api_key) => {
-                Ok(Configuration{api_key: api_key })
-            },
-            None => Err(error::Error::from("api_key missing from configuration file".to_owned()))
-        }
-    }
-
-    pub fn api_key(&self) ->  &String {
-        &self.api_key
+        let config: Configuration = serde_json::from_reader(file)?;
+        Ok(config)
     }
 }
