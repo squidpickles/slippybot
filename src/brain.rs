@@ -34,6 +34,7 @@ impl SlippyBrain {
                            Box::new(how_are_you::HowAreYou::new()),
                            Box::new(joy::Joy::new(true)),
                            Box::new(say::Say::new()),
+                           Box::new(celery::CeleryMan::new()),
                            Box::new(hello::Hello::new())],
             help_pattern: Regex::new(r"(?i)\bhelp\b").unwrap(),
         }
