@@ -8,7 +8,7 @@ slack = "*"
 regex = "*"
 log = "*"
 env_logger = "*"
-cron = { git = "https://github.com/zslayton/cron.git" }
+cron = "*"
 chrono = "*"
 serde = "*"
 serde_derive = "*"
