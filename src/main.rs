@@ -70,16 +70,23 @@ impl slack::EventHandler for SlippyHandler {
             if let slack::Message::Standard(msg) = *event_msg {
                 if let Some(ref txt) = msg.text {
                     info!("Message: {}", txt);
-                    if let Some(ref re) = self.me_finder {
-                        if let Some(ref chan) = msg.channel {
-                            if re.is_match(txt) || chan.starts_with('D') {
-                                if let Some(ref user_id) = msg.user {
-                                    match self.brain
+                    if let Some(ref my_id) = self.my_id {
+                        if let Some(ref re) = self.me_finder {
+                            if let Some(ref chan) = msg.channel {
+                                if re.is_match(txt) || chan.starts_with('D') {
+                                    if let Some(ref user_id) = msg.user {
+                                        // Ignore our own messages
+                                        if user_id != my_id {
+                                            match self.brain
                                               .lock()
                                               .unwrap() // FIXME: unwrap
                                               .interpret(cli.sender(), txt, user_id, chan) {
-                                        Ok(_) => {}
-                                        Err(err) => error!("Error interpreting message: {}", err),
+                                                Ok(_) => {}
+                                                Err(err) => {
+                                                    error!("Error interpreting message: {}", err)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

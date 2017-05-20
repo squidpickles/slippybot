@@ -30,10 +30,11 @@ pub struct SlippyBrain {
 impl SlippyBrain {
     pub fn new() -> SlippyBrain {
         SlippyBrain {
-            commands: vec![Box::new(hello::Hello::new()),
-                           Box::new(thanks::Thanks::new()),
+            commands: vec![Box::new(thanks::Thanks::new()),
                            Box::new(how_are_you::HowAreYou::new()),
-                           Box::new(joy::Joy::new(true))],
+                           Box::new(joy::Joy::new(true)),
+                           Box::new(say::Say::new()),
+                           Box::new(hello::Hello::new())],
             help_pattern: Regex::new(r"(?i)\bhelp\b").unwrap(),
         }
     }
