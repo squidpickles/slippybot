@@ -10,19 +10,21 @@ pub struct Say {
 impl Say {
     pub fn new() -> Say {
         Say {
-            pattern: Regex::new(r"(?i)say (?:in <[#@](?P<channel>\w+)\|\w+> )?(?P<message>.+)")
-                .unwrap(),
+            pattern: Regex::new(
+                r"(?i)say (?:in <[#@](?P<channel>\w+)\|\w+> )?(?P<message>.+)",
+            ).unwrap(),
         }
     }
 }
 
 impl Command for Say {
-    fn handle(&mut self,
-              sender: &slack::Sender,
-              text: &str,
-              _: &str,
-              channel: &str)
-              -> Result<Disposition, error::Error> {
+    fn handle(
+        &mut self,
+        sender: &slack::Sender,
+        text: &str,
+        _: &str,
+        channel: &str,
+    ) -> Result<Disposition, error::Error> {
         if let Some(caps) = self.pattern.captures(text) {
             if let Some(message) = caps.name("message") {
                 let reply_channel = match caps.name("channel") {
@@ -40,7 +42,7 @@ impl Command for Say {
 
 
     fn usage(&self) -> &'static str {
-        "`say (in #channel) message"
+        "`say` (`in #channel`) `message`"
     }
 
     fn description(&self) -> &'static str {
